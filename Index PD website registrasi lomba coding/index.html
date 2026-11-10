@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrasi Lomba Coding</title>
+</head>
+<body>
+
+    <h2>Form Registrasi Lomba Coding</h2>
+
+    <form id="formRegistrasi">
+
+        <label>Nama:</label><br>
+        <input type="text" name="nama" minlength="3" maxlength="50">
+        <span id="error-nama" style="color:red"></span>
+        <br><br>
+
+        <label>Email:</label><br>
+        <input type="email" name="email">
+        <span id="error-email" style="color:red"></span>
+        <br><br>
+
+        <label>Nomor HP:</label><br>
+        <input type="text" name="hp">
+        <span id="error-hp" style="color:red"></span>
+        <br><br>
+
+        <label>Umur:</label><br>
+        <input type="number" name="umur">
+        <span id="error-umur" style="color:red"></span>
+        <br><br>
+
+        <label>URL Repositori GitHub (Opsional):</label><br>
+        <input type="url" name="github">
+        <span id="error-github" style="color:red"></span>
+        <br><br>
+
+        <label>Kategori:</label><br>
+        <select name="kategori">
+            <option value="">-- Pilih Kategori --</option>
+            <option value="Web Development">Web Development</option>
+            <option value="Mobile Development">Mobile Development</option>
+            <option value="Data Science">Data Science</option>
+        </select>
+        <span id="error-kategori" style="color:red"></span>
+        <br><br>
+
+        <label>Jenis Peserta:</label><br>
+        <input type="radio" name="peserta" value="Individu"> Individu
+        <input type="radio" name="peserta" value="Tim"> Tim
+        <br>
+        <span id="error-peserta" style="color:red"></span>
+        <br><br>
+
+        <button type="submit">Daftar</button>
+
+    </form>
+
+    <div id="hasil"></div>
+
+    <script>
+        const form = document.getElementById('formRegistrasi');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Menghapus pesan error sebelumnya
+            document.querySelectorAll('[id^="error-"]').forEach(el => {
+                el.textContent = '';
+            });
+
+            document.getElementById('hasil').innerHTML = '';
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('proses.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.errors) {
+                    for (const field in result.errors) {
+                        document.getElementById('error-' + field).textContent =
+                            result.errors[field];
+                    }
+                } else if (result.success) {
+                    document.getElementById('hasil').innerHTML =
+                        result.output;
+
+                    form.reset();
+                }
+
+            } catch (error) {
+                document.getElementById('hasil').textContent =
+                    'Terjadi kesalahan saat mengirim data.';
+            }
+        });
+    </script>
+
+</body>
+</html>
